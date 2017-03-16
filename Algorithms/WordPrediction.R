@@ -26,6 +26,17 @@ get_qbo_obs_quadgrams <- function(inputWords,quadgram,Gamma)
     qbo_obs_quadgrams
 }
 
+get_cleanInput <- function(inputWords){
+    #change to lowercase
+    outputWords <- tolower(inputWords)
+    #remove punctuation [!"\#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~]
+    outputWords <- gsub('[[:punct:]]','',outputWords) 
+    #remove numbers
+    outputWords <- gsub('[[:digit:]]','', outputWords)
+    
+    outputWords
+}
+
 
 
 wordPredictionV1 <- function(inputWords){
@@ -89,7 +100,7 @@ wordPredictionV1 <- function(inputWords){
     
     finalProb <- rbind(qbo_obs_trigrams,qbo_unobs_trigrams)
     
-    head(finalProb,20)
+    head(finalProb,5)
     
 }
 
@@ -97,7 +108,8 @@ wordPredictionV1 <- function(inputWords){
 
 wordPredictionV2 <- function(inputWords){
 
-
+inputWords = get_cleanInput(inputWords)
+    
 library(stringr)
 
 Gamma <- 0.5
@@ -149,9 +161,12 @@ if (x == 0) {
   
     
     finalProb <- rbind(qbo_obs_quadgrams,qbo_unobs_quadgrams)  
+
     
-    head(finalProb,10)
+    head(finalProb,5)
     
     }
 
 }
+
+
