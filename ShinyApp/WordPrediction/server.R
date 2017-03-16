@@ -22,7 +22,7 @@ shinyServer(function(input, output) {
         result$index <- rownames(result) 
         wordChoices <- as.list(result$LastWord)
         selectInput("Suggestions", 
-                    "Chose Prediction",
+                    "Choose Prediction",
                     choices = wordChoices
         )
     })
@@ -34,11 +34,16 @@ shinyServer(function(input, output) {
     predictionSelection <- eventReactive(input$Suggestions, {
         selectedText <- input$Suggestions
     })
-    
+ 
+    updatedInputText <- eventReactive(input$inputText, {
+        newInputText <- input$inputText
+    })
+       
     output$updatedText <- renderText({
-        paste(input$inputText,predictionSelection())
+        paste("Output: ",updatedInputText(),predictionSelection())
     }
     )
-    #STILL NEED TO WORK OUT HOW TO UPDATE THE INPUT
+
+    #STILL NEED TO WORK OUT HOW TO UPDATE THE INPUT TEXT BASED ON CHOICE
     
 })

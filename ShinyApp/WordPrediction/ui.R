@@ -28,7 +28,7 @@ shinyUI(fluidPage(
     # Show a plot of the generated distribution
     mainPanel(
        uiOutput("predict_dropdown"),
-       textOutput("updatedText")
+       strong(textOutput("updatedText"))
        #Add this is for the time, but needs to go be the choices for text box
     )
   )

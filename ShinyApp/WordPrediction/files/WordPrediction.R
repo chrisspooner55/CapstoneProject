@@ -40,6 +40,8 @@ get_cleanInput <- function(inputWords){
     outputWords <- gsub('[[:punct:]]','',outputWords) 
     #remove numbers
     outputWords <- gsub('[[:digit:]]','', outputWords)
+    #trim white space
+    outputWords <- trimws(outputWords, which = "both")
     
     outputWords
 }
