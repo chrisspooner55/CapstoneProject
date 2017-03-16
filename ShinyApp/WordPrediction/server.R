@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+source("helpers.R")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -16,7 +17,7 @@ shinyServer(function(input, output) {
     #when the predict button is pressed
     
     choices <- eventReactive(input$predict, {
-        result <- wordPredictionV2(input = input$inputText)
+        result <- wordPrediction(input = input$inputText)
         rownames(result) <- 1:nrow(result)
         result$index <- rownames(result) 
         wordChoices <- as.list(result$LastWord)
@@ -26,14 +27,18 @@ shinyServer(function(input, output) {
         )
     })
     
-    
     output$predict_dropdown <- renderUI({
         choices()
     })
     
+    predictionSelection <- eventReactive(input$Suggestions, {
+        selectedText <- input$Suggestions
+    })
     
-    #see to default with null 
-    #http://stackoverflow.com/questions/40152857/how-to-dynamically-populate-dropdown-box-choices-in-shiny-dashboard
-
+    output$updatedText <- renderText({
+        paste(input$inputText,predictionSelection())
+    }
+    )
+    #STILL NEED TO WORK OUT HOW TO UPDATE THE INPUT
     
 })

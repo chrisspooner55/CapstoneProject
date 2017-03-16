@@ -66,7 +66,7 @@ for(i in 1:length(testDataset)){
 colnames(wordPredictionTestDataSet)[1] <- "Input"
 
 wordPredictionTestDataSet <- wordPredictionTestDataSet[!is.na(wordPredictionTestDataSet$Input),]
-
+wordPredictionTestDataSet <- as.data.frame(wordPredictionTestDataSet)
 
 
 

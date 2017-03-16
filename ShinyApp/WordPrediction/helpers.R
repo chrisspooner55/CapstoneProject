@@ -1,0 +1,5 @@
+source("files/WordPrediction.R")
+load("files/wfUniGram.RData")
+load("files/wfBigram.RData")
+load("files/wfTriGram.RData")
+load("files/wfQuadGram.RData")

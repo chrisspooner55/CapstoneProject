@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#\n# This is the user-interface definition of a Shiny web application. You can\n# run the application by clicking 'Run App' above.\n#\n# Find out more about building applications with Shiny here:\n# \n#    http://shiny.rstudio.com/\n#\n\nlibrary(shiny)\nlibrary(shinythemes)\n# Define UI for application that draws a histogram\nshinyUI(fluidPage(\n  theme = shinytheme(\"sandstone\"),\n  # Application title\n  titlePanel(\"Predicting the Next Word\"),\n  \n  # Sidebar with a slider input for number of bins \n  sidebarLayout(\n    sidebarPanel(\n        #img(src = \"crystal-ball-512.png\", height = 100, width = 100, align = \"center\"),\n        textInput(\"inputText\"\n                  , label = p(\"Enter one or more words and click predict to see suggestions:\"\n                              , style = \"color:blue\")\n                  ),\n        actionButton(\"predict\", \"Predict\")\n    ),\n    # Show a plot of the generated distribution\n    mainPanel(\n       uiOutput(\"predict_dropdown\")\n       #Add this is for the time, but needs to go be the choices for text box\n    )\n  )\n))\n",
+    "created" : 1489146277519.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4010626719",
+    "id" : "36769492",
+    "lastKnownWriteTime" : 1489624310,
+    "last_content_update" : 1489624310224,
+    "path" : "C:/Projects/R Projects/Capstone Datascience/CapstoneProject/ShinyApp/WordPrediction/ui.R",
+    "project_path" : "ShinyApp/WordPrediction/ui.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

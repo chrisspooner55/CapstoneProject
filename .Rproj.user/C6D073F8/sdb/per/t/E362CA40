@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "\n#function to read in the source data and sample 5 percent using the \n#rbinom function\n\n\nsubSampleText <- function(filePath, outfilePath, subSamplepct){\n    temp <- readLines(filePath)\n    randLines <- rbinom(length(temp),1,0.999)\n    temp <- temp[!randLines]\n    \n        #replace funny characters\n    temp <- gsub(\"â€™\",\"'\",temp)\n    temp <- gsub(\"â€“\",\"-\",temp)\n    temp <- gsub(\"â€”\",\"-\",temp)    \n    temp <- gsub(\"â€œ\",\" \",temp)    \n    temp <- gsub(\"â€\",\" \",temp)     \n    \n    write(temp, file = outfilePath,1,append=FALSE)\n}\n\n\n#20% could not process TriGrams\n#Trying 10%\n\nseed <- 54321\n\nfilePath <- \"C:\\\\Projects\\\\R Projects\\\\Capstone Datascience\\\\en_US\\\\en_US.twitter.txt\"\noutfilePath <- \"C:\\\\Projects\\\\R Projects\\\\Capstone Datascience\\\\CapstoneProject\\\\texts\\\\en_US.twitter_Test.txt\"\n\nsubSampleText(filePath,outfilePath,subSamplepct)\n\nfilePath <- \"C:\\\\Projects\\\\R Projects\\\\Capstone Datascience\\\\en_US\\\\en_US.blogs.txt\"\noutfilePath <- \"C:\\\\Projects\\\\R Projects\\\\Capstone Datascience\\\\CapstoneProject\\\\texts\\\\en_US.blogs_Test.txt\"\n\nsubSampleText(filePath,outfilePath,subSamplepct)\n\nfilePath <- \"C:\\\\Projects\\\\R Projects\\\\Capstone Datascience\\\\en_US\\\\en_US.news.txt\"\noutfilePath <- \"C:\\\\Projects\\\\R Projects\\\\Capstone Datascience\\\\CapstoneProject\\\\texts\\\\en_US.news_Test.txt\"\n\nsubSampleText(filePath,outfilePath,subSamplepct)\n\ntestDataset1 <- readLines(\"C:\\\\Projects\\\\R Projects\\\\Capstone Datascience\\\\CapstoneProject\\\\texts\\\\en_US.twitter_Test.txt\")\ntestDataset2 <- readLines(\"C:\\\\Projects\\\\R Projects\\\\Capstone Datascience\\\\CapstoneProject\\\\texts\\\\en_US.blogs_Test.txt\")\ntestDataset3 <- readLines(\"C:\\\\Projects\\\\R Projects\\\\Capstone Datascience\\\\CapstoneProject\\\\texts\\\\en_US.news_Test.txt\")\n\ntestDataset <- append(testDataset1,testDataset2)\ntestDataset <- append(testDataset,testDataset3)\n\n#Now to randomly pick 3 words from each line\nlibrary(stringr)\n\nwordPredictionTestDataSet <- data.frame(input=as.character())\n\nfor(i in 1:length(testDataset)){\n    testDataset[i]\n    a <- sapply(gregexpr(\"\\\\W+\", testDataset[i]), length) + 1\n        if(a > 4) {\n        a <- a - 4\n        a <- sample(1:a, replace=T, 1)\n        temp <- as.data.frame(word(testDataset[i],a,a+3,sep = fixed(\" \")))\n        temp\n        wordPredictionTestDataSet <- rbind(wordPredictionTestDataSet,temp)\n        }\n}\n\ncolnames(wordPredictionTestDataSet)[1] <- \"Input\"\n\nwordPredictionTestDataSet <- wordPredictionTestDataSet[!is.na(wordPredictionTestDataSet$Input),]\nwordPredictionTestDataSet <- as.data.frame(wordPredictionTestDataSet)\n\n\n\n\n\n",
+    "created" : 1489667528119.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2189603463",
+    "id" : "E362CA40",
+    "lastKnownWriteTime" : 1489667641,
+    "last_content_update" : 1489667641910,
+    "path" : "C:/Projects/R Projects/Capstone Datascience/CapstoneProject/CreateTestDataset.R",
+    "project_path" : "CreateTestDataset.R",
+    "properties" : {
+        "docOutlineVisible" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

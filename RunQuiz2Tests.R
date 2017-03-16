@@ -47,44 +47,18 @@ for(i in 1:10){
     }
 }
 
-#Prediction2
-for(i in 1:10){
-    startTime = NULL
-    endTime = NULL
-    currentTest <- tolower(testCases[i,c("InputText")])
-    
-    print(currentTest)
-    
-    startTime <- Sys.time()
-    
-    results <- wordPredictionV2(currentTest)
-    
-    endTime <- Sys.time()
-    
-    testCases$DurationV2 <- as.numeric(difftime(endTime,startTime))
-    
-    x <- nrow(results[testCases$Expected[i] %in% results$LastWord,]) 
-    
-    if(x > 0) {
-        testCases$ResultV2[i] <- "ExpectedFound"
-        
-    } else {
-        testCases$ResultV2[i] <- "NotFound"
-    }
-}
 
 testCases
 
-input = "adore the stats"
-wordPredictionV2(tolower(input))
 
-wordPredictionTestDataSet$ResultV2 <- ""
+wordPredictionTestDataSet$ResultV2 = ""
 
-for(i in 1:nrow(wordPredictionTestDataSet)) {
+
+for(i in 1:100) {
     
     currentTest <- word(tolower(wordPredictionTestDataSet[i,c("Input")]),-4,-2)
 
-    results <- wordPredictionV2(currentTest)
+    results <- wordPrediction(currentTest)
  
     x <- nrow(results[word(wordPredictionTestDataSet$Input[i],-1) %in% results$LastWord,]) 
     
@@ -104,12 +78,12 @@ for(i in 1:nrow(wordPredictionTestDataSet)) {
 nrow(wordPredictionTestDataSet[wordPredictionTestDataSet$ResultV2=="ExpectedFound",])/nrow(wordPredictionTestDataSet)*100
 
 #fails with a capital letter?
-wordPredictionV2("This is the")
-wordPredictionV2("this is the")
-wordPredictionV2("he needs to")
-wordPredictionV2("the dog is")
-wordPredictionV2("a case of")
-wordPredictionV2("click predict to")
+wordPrediction("This is the")
+wordPrediction("this is the")
+wordPrediction("he needs to")
+wordPrediction("the dog is")
+wordPrediction("a case of")
+wordPrediction("click predict to")
 
 
 

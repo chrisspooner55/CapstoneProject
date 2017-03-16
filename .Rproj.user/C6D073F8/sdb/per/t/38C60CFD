@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(stringr)\n\n#Test cases for algorithm based on the quizzes\n\ntestCases <- read.delim(file = \"Quiz1Input.txt\",header = FALSE)\n\ntestCases[] <- lapply(testCases, as.character)\n\ncolnames(testCases) <- c(\"InputText\")\n\ntestCases$Expected = \"\"\n\ntestCases$Expected[1] = \"beer\"\ntestCases$Expected[2] = \"most\"\ntestCases$Expected[3] = \"most\"\ntestCases$Expected[4] = \"defence\"\ntestCases$Expected[5] = \"movie\"\ntestCases$Expected[6] = \"way\"\ntestCases$Expected[7] = \"time\"\ntestCases$Expected[8] = \"fingers\"\ntestCases$Expected[9] = \"bad\"\ntestCases$Expected[10] = \"insane\"\n\n\nfor(i in 1:10){\n    startTime = NULL\n    endTime = NULL\n    currentTest <- tolower(testCases[i,c(\"InputText\")])\n    \n    print(currentTest)\n    \n    startTime <- Sys.time()\n    \n    results <- wordPredictionV1(currentTest)\n    \n    endTime <- Sys.time()\n    \n    testCases$DurationV1 <- as.numeric(difftime(endTime,startTime))\n    \n    x <- nrow(results[testCases$Expected[i] %in% results$LastWord,]) \n    \n    if(x > 0) {\n        testCases$ResultV1[i] <- \"ExpectedFound\"\n        \n    } else {\n        testCases$ResultV1[i] <- \"NotFound\"\n    }\n}\n\n\ntestCases\n\n\nwordPredictionTestDataSet$ResultV2 = \"\"\n\n\nfor(i in 1:100) {\n    \n    currentTest <- word(tolower(wordPredictionTestDataSet[i,c(\"Input\")]),-4,-2)\n\n    results <- wordPrediction(currentTest)\n \n    x <- nrow(results[word(wordPredictionTestDataSet$Input[i],-1) %in% results$LastWord,]) \n    \n    \n   # y <- results[word(wordPredictionTestDataSet$Input[i],-1) = results$LastWord,])\n    \n    if(x > 0) {\n        wordPredictionTestDataSet$ResultV2[i] <- \"ExpectedFound\"\n        ##wordPredictionTestDataSet$Position[i] <- y\n        \n    } else {\n        wordPredictionTestDataSet$ResultV2[i] <- \"NotFound\"\n    }    \n    \n}\n#Orediction rate\nnrow(wordPredictionTestDataSet[wordPredictionTestDataSet$ResultV2==\"ExpectedFound\",])/nrow(wordPredictionTestDataSet)*100\n\n#fails with a capital letter?\nwordPrediction(\"This is the\")\nwordPrediction(\"this is the\")\nwordPrediction(\"he needs to\")\nwordPrediction(\"the dog is\")\nwordPrediction(\"a case of\")\nwordPrediction(\"click predict to\")\n\n\n\n",
+    "created" : 1489209826113.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2543165601",
+    "id" : "38C60CFD",
+    "lastKnownWriteTime" : 1489668276,
+    "last_content_update" : 1489668276219,
+    "path" : "C:/Projects/R Projects/Capstone Datascience/CapstoneProject/RunQuiz2Tests.R",
+    "project_path" : "RunQuiz2Tests.R",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
