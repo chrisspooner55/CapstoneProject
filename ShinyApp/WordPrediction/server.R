@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(stringr)
 source("helpers.R")
 
 # Define server logic required to draw a histogram
@@ -17,13 +18,19 @@ shinyServer(function(input, output) {
     #when the predict button is pressed
     
     choices <- eventReactive(input$predict, {
-        result <- wordPrediction(input = input$inputText)
-        rownames(result) <- 1:nrow(result)
-        result$index <- rownames(result) 
-        wordChoices <- as.list(result$LastWord)
-        selectInput("Suggestions", 
-                    "Choose Prediction",
-                    choices = wordChoices
+        if (str_count(inputWords, pattern = " ") + 1 >= 2) {
+            result <- wordPrediction(input = input$inputText)
+            rownames(result) <- 1:nrow(result)
+            result$index <- rownames(result) 
+            wordChoices <- as.list(result$LastWord)
+        }
+        else {
+            wordChoices <- NULL
+        }
+            selectInput("Suggestions", 
+                        "Choose Prediction",
+                        choices = wordChoices
+        
         )
     })
     

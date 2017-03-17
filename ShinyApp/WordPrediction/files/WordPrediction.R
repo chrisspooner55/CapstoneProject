@@ -20,8 +20,7 @@ get_qbo_obs_trigrams <- function(inputWords,trigram,Gamma)
 
 get_qbo_obs_quadgrams <- function(inputWords,quadgram,Gamma)
 {
-    LastWords <- word(inputWords,-3,-1)
-    
+
     qbo_obs_quadgrams <-  wfQuadGram[wfQuadGram$FirstWords==LastWords,] #get freq of the Quadgram words
     
     #calculate the maximim likelihood 
@@ -29,7 +28,7 @@ get_qbo_obs_quadgrams <- function(inputWords,quadgram,Gamma)
     if(nrow(qbo_obs_quadgrams)!=0){
         qbo_obs_quadgrams$source <- "Quadgrams"
     }
-        
+    
     qbo_obs_quadgrams
 }
 
@@ -48,7 +47,7 @@ get_cleanInput <- function(inputWords){
 
 
 get_TriGramKatzBO <- function(inputWords){
-#This algorithm uses Katz back off model for trigrams and uses a default discount of 0.5    
+    #This algorithm uses Katz back off model for trigrams and uses a default discount of 0.5    
     
     library(stringr)
     
@@ -69,7 +68,7 @@ get_TriGramKatzBO <- function(inputWords){
     if(nrow(unobs_trig_tails)!=0){
         unobs_trig_tails$source <- "Unigrams"
     }
-        
+    
     LastWord <- word(inputWords,-1,-1)
     
     #Find the observed bigrams and remove the ones already observed
@@ -100,9 +99,9 @@ get_TriGramKatzBO <- function(inputWords){
     
     #Add in the last input word to the tails so it can be binded to the other data frames
     if(nrow(unobs_trig_tails)!=0){
-    unobs_trig_tails$FirstWords <- LastWord
-    names(unobs_trig_tails)[names(unobs_trig_tails)=="word"] <- "LastWord"
-    unobs_trig_tails <- unobs_trig_tails[,c("FirstWords","LastWord","freq","pDisc","source")] 
+        unobs_trig_tails$FirstWords <- LastWord
+        names(unobs_trig_tails)[names(unobs_trig_tails)=="word"] <- "LastWord"
+        unobs_trig_tails <- unobs_trig_tails[,c("FirstWords","LastWord","freq","pDisc","source")] 
     }
     
     #check the sum of unobserved bigrams equates to the missing probabilty mass
@@ -124,72 +123,111 @@ get_TriGramKatzBO <- function(inputWords){
 
 
 wordPrediction <- function(inputWords){
-
-#Example call
-#wordPrediction("jes fds rsadsa")    
     
-inputWords = get_cleanInput(inputWords)
+    #Example call
+    #wordPrediction("jes fds rsadsa")    
     
-library(stringr)
-
-Gamma <- 0.5
-
-#Get the last 3 words
-LastWords <- word(inputWords,-3,-1)
-
-qbo_obs_quadgrams <- get_qbo_obs_quadgrams(inputWords = LastWords,quadgram = wfQuadGram,Gamma = 0.5)
-
-x <- nrow(qbo_obs_quadgrams)
-
-if (x == 0) {
-    #none observed at the Quadgram level so back off to the TriGram
-    get_TriGramKatzBO(LastWords)
-} else {
+    inputWords = get_cleanInput(inputWords)
     
-    #Find the observed bigrams and remove the ones already observed
-    qbo_obs_trigrams <- wfTriGram[wfTriGram$FirstWords == word(inputWords,-2,-1),]
-    qbo_obs_trigrams <- qbo_obs_trigrams[!qbo_obs_trigrams$LastWord %in% qbo_obs_quadgrams$LastWord,]
+    library(stringr)
     
-    if(nrow(qbo_obs_trigrams)!=0){
-        qbo_obs_trigrams$source <- "Trigrams"
-    }
-    #Calculate backed off probabilities for trigrams
-    if(nrow(qbo_obs_trigrams)!=0){
-        qbo_obs_trigrams$pDisc <- (qbo_obs_trigrams$freq - Gamma)/sum(qbo_obs_trigrams$freq)
-    }   
-       
-    #Find unobserved tail bigrams, we won't go lower to unigrams
-    unobs_quad_tails <- wfBigram[!wfBigram$LastWord %in% qbo_obs_quadgrams$LastWord 
-        & wfBigram$FirstWords %in% word(qbo_obs_quadgrams$FirstWords,-1),]
-    
-    if(nrow(unobs_quad_tails)!=0){
-    unobs_quad_tails$source <- "Bigrams"
+    if(str_count(inputWords, pattern = " ") + 1 >=3) {
+        #Get the last 3 words
+        LastWords <- word(inputWords,-3,-1)
+    } else {
+        LastWords <- word(inputWords,-2,-1)
     }
     
-    #remove the observed tails in the observed trigrams
-    unobs_quad_tails <- unobs_quad_tails[!unobs_quad_tails$LastWord %in% qbo_obs_trigrams$LastWord
-        & unobs_quad_tails$FirstWords %in% word(qbo_obs_trigrams$FirstWords,-1),]
+    Gamma <- 0.5
     
-    #Get the alpha or left over probablity mass at the bigram level
+    qbo_obs_quadgrams <- get_qbo_obs_quadgrams(inputWords = LastWords,quadgram = wfQuadGram,Gamma = 0.5)
     
-    #TODO - apply the discounting
+    x <- nrow(qbo_obs_quadgrams)
     
-    alpha_trigram <- 1 - sum((qbo_obs_trigrams$freq-Gamma)/sum(qbo_obs_trigrams$freq))
-    
-    #Calculate the probablity of the tails with the proportioned left over probablity mass
-    unobs_quad_tails$pDisc <- alpha_trigram*(unobs_quad_tails$freq/sum(unobs_quad_tails$freq))
-    
-    alpha_quadgram <- 1 - sum(qbo_obs_quadgrams$pDisc)    
-    
-    qbo_unobs_quadgrams <- rbind(qbo_obs_trigrams,unobs_quad_tails)
-    
-    qbo_unobs_quadgrams$pDisc <- alpha_quadgram*(qbo_unobs_quadgrams$pDisc/sum(qbo_unobs_quadgrams$pDisc))
-
-    finalProb <- rbind(qbo_obs_quadgrams,qbo_unobs_quadgrams)  
-
-    head(finalProb,5)
+    if (x == 0) {
+        #none observed at the Quadgram level so back off to the TriGram
+        get_TriGramKatzBO(LastWords)
+    } else {
+        
+        #Find the observed bigrams and remove the ones already observed
+        qbo_obs_trigrams <- wfTriGram[wfTriGram$FirstWords == word(inputWords,-2,-1),]
+        qbo_obs_trigrams <- qbo_obs_trigrams[!qbo_obs_trigrams$LastWord %in% qbo_obs_quadgrams$LastWord,]
+        
+        if(nrow(qbo_obs_trigrams)!=0){
+            qbo_obs_trigrams$source <- "Trigrams"
+        }
+        #Calculate backed off probabilities for trigrams
+        if(nrow(qbo_obs_trigrams)!=0){
+            qbo_obs_trigrams$pDisc <- (qbo_obs_trigrams$freq - Gamma)/sum(qbo_obs_trigrams$freq)
+        }   
+        
+        #Find unobserved tail bigrams, we won't go lower to unigrams
+        unobs_quad_tails <- wfBigram[!wfBigram$LastWord %in% qbo_obs_quadgrams$LastWord 
+                                     & wfBigram$FirstWords %in% word(qbo_obs_quadgrams$FirstWords,-1),]
+        
+        if(nrow(unobs_quad_tails)!=0){
+            unobs_quad_tails$source <- "Bigrams"
+        }
+        
+        #remove the observed tails in the observed trigrams
+        unobs_quad_tails <- unobs_quad_tails[!unobs_quad_tails$LastWord %in% qbo_obs_trigrams$LastWord
+                                             & unobs_quad_tails$FirstWords %in% word(qbo_obs_trigrams$FirstWords,-1),]
+        
+        #Get the alpha or left over probablity mass at the bigram level
+        
+        #TODO - apply the discounting
+        
+        alpha_trigram <- 1 - sum((qbo_obs_trigrams$freq-Gamma)/sum(qbo_obs_trigrams$freq))
+        
+        #Calculate the probablity of the tails with the proportioned left over probablity mass
+        unobs_quad_tails$pDisc <- alpha_trigram*(unobs_quad_tails$freq/sum(unobs_quad_tails$freq))
+        
+        alpha_quadgram <- 1 - sum(qbo_obs_quadgrams$pDisc)    
+        
+        qbo_unobs_quadgrams <- rbind(qbo_obs_trigrams,unobs_quad_tails)
+        
+        qbo_unobs_quadgrams$pDisc <- alpha_quadgram*(qbo_unobs_quadgrams$pDisc/sum(qbo_unobs_quadgrams$pDisc))
+        
+        finalProb <- rbind(qbo_obs_quadgrams,qbo_unobs_quadgrams)  
+        
+        head(finalProb,5)
     }
-
+    
 }
 
+#Refer to http://stats.stackexchange.com/questions/91581/question-about-good-turing-discounting?rq=1
+#for a good explanation of good turing
+
+calculateDiscount <- function (Ngrams,unseenNgrams) {
+    
+    # Supposed table "threeGramTable" as above, we want to add a "discount" column.
+    
+    #add discount column and set to 1
+    Ngrams$discount = rep(1, nrow(Ngrams))
+    
+    # Calculate the discount coefficient.
+    # We only consider n-grams that have 0 < frequency <= k (5). Larger than 5: "Reliable enough".
+    
+    #N is the total number of unseen N-Grams
+    N = sum(Ngrams[Ngrams$freq < 5,c("freq")]) + nrow(unseenNgrams)
+    
+    for(i in 1:5){
+        #start at i = 1 as we removed all frequencies of 1    
+        currRTimes = i 
+        nextRTimes = currRTimes + 1
+        
+        if(i==1)
+            currN = nrow(unseenNgrams)
+        else
+            currN = nrow(Ngrams[Ngrams$freq == currRTimes,])
+        
+        nextN = nrow(Ngrams[Ngrams$freq == nextRTimes,])
+        
+        currd <- nextN/N*currN
+        
+        Ngrams[Ngrams$freq == currRTimes,"discount"] <- currd
+    }
+    
+    Ngrams
+}
 
