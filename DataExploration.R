@@ -4,6 +4,10 @@ rm(list=ls())
 
 #subsets of the data have been placed in C:\Projects\R Projects\Capstone Datascience\CapstoneProject\texts
 
+#increase the memory to 1GB for Java
+options(java.parameters = "-Xmx8000m")
+
+
 library(SnowballC) 
 library(tm)  
 library(dplyr)
@@ -32,6 +36,10 @@ docs <- tm_map(docs, removeWords, profanity)
 docs <- tm_map(docs, stripWhitespace) 
 docs <- tm_map(docs, PlainTextDocument)   
 
+
+save(docs,file="docs.RData")
+
+
 #Convert to matrix, this takes a while to run
 dtmUniGram <- DocumentTermMatrix(docs)   
 
@@ -56,6 +64,16 @@ nrow(wfUniGram[wfUniGram$CumulativePct$cumsum < 50,])
 #Number of words making up 90 percent of the Corpus
 nrow(wfUniGram[wfUniGram$CumulativePct$cumsum < 90,])
 
+#get rid of the row names
+row.names(wfUniGram) <- NULL
+
+#Save data for knitR markdown
+
+save(wfUniGram,file="wfUniGram.RData")
+save(dtmUniGram,file="dtmUniGram.RData")
+
+open("docs.RData")
+
 ##Let's now create a bi-gram
 BigramTokenizer <- function(x) NGramTokenizer(x, 
                                               Weka_control(min = 2, max = 2))
@@ -74,6 +92,19 @@ p <- ggplot(head(wfBigram,20), aes(word, freq))
 p <- p + geom_bar(stat="identity")   
 p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))   
 p   
+
+#get rid of the row names
+row.names(wfBigram) <- NULL
+wfBigram$LastWord <- word(wfBigram$word,-1)
+wfBigram$FirstWords <- word(wfBigram$word,-2)
+
+#Redefine the data frame to make things easier to work with
+wfBigram <- wfBigram[,c("FirstWords","LastWord","freq")]
+
+
+save(wfBigram,file="wfBiGram.RData")
+save(dtm_BiGram,file="dtmBiGram.RData")
+
 
 ##Let's now create a tri-gram
 TrigramTokenizer <- function(x) NGramTokenizer(x, 
@@ -94,6 +125,19 @@ p <- p + geom_bar(stat="identity")
 p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))   
 p   
 
+
+#get rid of the row names
+row.names(wfTriGram) <- NULL
+wfTriGram$LastWord <- word(wfTriGram$word,-1)
+wfTriGram$FirstWords <- word(wfTriGram$word,-3,-2)
+
+#Redefine the data frame to make things easier to work with
+wfTriGram <- wfTriGram[,c("FirstWords","LastWord","freq")]
+
+save(wfTriGram,file="wfTriGram.RData")
+save(dtm_TriGram,file="dtmTriGram.RData")
+
+
 ##Let's now create a quad-gram
 QuadgramTokenizer <- function(x) NGramTokenizer(x, 
                                                Weka_control(min = 4, max = 4))
@@ -110,13 +154,6 @@ wfQuadGram$word = factor(wfQuadGram$word, levels = wfQuadGram$word[order(-wfQuad
 
 ##Clean up the data frames
 
-#get rid of the row names
-row.names(wfTriGram) <- NULL
-wfTriGram$LastWord <- word(wfTriGram$word,-1)
-wfTriGram$FirstWords <- word(wfTriGram$word,-3,-2)
-
-#Redefine the data frame to make things easier to work with
-wfTriGram <- wfTriGram[,c("FirstWords","LastWord","freq")]
 
 
 #get rid of the row names
@@ -126,28 +163,6 @@ wfQuadGram$FirstWords <- word(wfQuadGram$word,-4,-2)
 
 #Redefine the data frame to make things easier to work with
 wfQuadGram <- wfQuadGram[,c("FirstWords","LastWord","freq")]
-
-#get rid of the row names
-row.names(wfBigram) <- NULL
-wfBigram$LastWord <- word(wfBigram$word,-1)
-wfBigram$FirstWords <- word(wfBigram$word,-2)
-
-#Redefine the data frame to make things easier to work with
-wfBigram <- wfBigram[,c("FirstWords","LastWord","freq")]
-
-#get rid of the row names
-row.names(wfUniGram) <- NULL
-
-#Save data for knitR markdown
-
-save(wfUniGram,file="wfUniGram.RData")
-save(dtmUniGram,file="dtmUniGram.RData")
-
-save(wfBigram,file="wfBiGram.RData")
-save(dtm_BiGram,file="dtmBiGram.RData")
-
-save(wfTriGram,file="wfTriGram.RData")
-save(dtm_TriGram,file="dtmTriGram.RData")
 
 save(wfQuadGram,file="wfQuadGram.RData")
 save(dtm_QuadGram,file="dtmQuadGram.RData")

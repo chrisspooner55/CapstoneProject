@@ -31,11 +31,11 @@ for(i in 1:10){
     
     startTime <- Sys.time()
     
-    results <- wordPredictionV1(currentTest)
+    results <- wordPrediction(currentTest)
     
     endTime <- Sys.time()
     
-    testCases$DurationV1 <- as.numeric(difftime(endTime,startTime))
+    testCases$DurationV1[i] <- as.numeric(difftime(endTime,startTime))
     
     x <- nrow(results[testCases$Expected[i] %in% results$LastWord,]) 
     
@@ -53,15 +53,29 @@ testCases
 
 wordPredictionTestDataSet$ResultV2 = ""
 
+n <- 100
 
-for(i in 1:100) {
+for(i in 1:n) {
     
-    currentTest <- word(tolower(wordPredictionTestDataSet[i,c("Input")]),-4,-2)
+    currentTest <- wordPredictionTestDataSet[i,c("Input")]
+    currentTest <- word(currentTest,-4,-2)
+    
+    print(paste(i,currentTest))
+    
+    startTime <- Sys.time()
 
     results <- wordPrediction(currentTest)
  
-    x <- nrow(results[word(wordPredictionTestDataSet$Input[i],-1) %in% results$LastWord,]) 
+    endTime <- Sys.time()
     
+    #Checks if in top 5
+    x <- nrow(results[word(wordPredictionTestDataSet$Input[i],-1) %in% results$LastWord,]) 
+    #Checks if 1st one matches
+    y <- nrow(results[word(wordPredictionTestDataSet$Input[i],-1) == head(results$LastWord,1),]) 
+    
+    wordPredictionTestDataSet$DurationV1[i] <- as.numeric(difftime(endTime,startTime))
+    
+    wordPredictionTestDataSet$PredictionResult[i] <-  head(results$LastWord,1)
     
    # y <- results[word(wordPredictionTestDataSet$Input[i],-1) = results$LastWord,])
     
@@ -73,17 +87,26 @@ for(i in 1:100) {
         wordPredictionTestDataSet$ResultV2[i] <- "NotFound"
     }    
     
+    if(y > 0) {
+        wordPredictionTestDataSet$ExactMatch[i] <- "Match"
+        ##wordPredictionTestDataSet$Position[i] <- y
+        
+    } else {
+        wordPredictionTestDataSet$ExactMatch[i] <- "NoMatch"
+    }       
+    
 }
-#Orediction rate
-nrow(wordPredictionTestDataSet[wordPredictionTestDataSet$ResultV2=="ExpectedFound",])/nrow(wordPredictionTestDataSet)*100
 
-#fails with a capital letter?
-wordPrediction("This is the")
-wordPrediction("this is the")
-wordPrediction("he needs to")
-wordPrediction("the dog is")
-wordPrediction("a case of")
-wordPrediction("click predict to")
+wordPredictionTests <- wordPredictionTestDataSet[1:n,]
+#Orediction rate
+print(paste("Top 5 Prediction Rate:"
+            ,nrow(wordPredictionTests[wordPredictionTests$ResultV2=="ExpectedFound",])/nrow(wordPredictionTests)*100,"%"))
+print(paste("Top 1 Prediction Rate:"
+            ,nrow(wordPredictionTests[wordPredictionTests$ExactMatch=="Match",])/nrow(wordPredictionTests)*100,"%"))
+print(paste("Average run time:",mean(wordPredictionTests$DurationV1),"ms"))
+print(paste("Min run time:",min(wordPredictionTests$DurationV1),"ms"))
+print(paste("Max run time:",max(wordPredictionTests$DurationV1),"ms"))
+print(paste("Sum run time:",sum(wordPredictionTests$DurationV1),"ms"))
 
 
 

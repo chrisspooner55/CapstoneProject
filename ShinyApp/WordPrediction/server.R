@@ -18,7 +18,7 @@ shinyServer(function(input, output) {
     #when the predict button is pressed
     
     choices <- eventReactive(input$predict, {
-        if (str_count(inputWords, pattern = " ") + 1 >= 2) {
+        if (str_count(input$inputText, pattern = " ") + 1 >= 2) {
             result <- wordPrediction(input = input$inputText)
             rownames(result) <- 1:nrow(result)
             result$index <- rownames(result) 
